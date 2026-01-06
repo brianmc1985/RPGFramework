@@ -101,7 +101,10 @@ void URPGAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, f
 	{
 		AdjustAttributeForMaxChange(Adrenaline, MaxAdrenaline, NewValue, GetAdrenalineAttribute());
 	}
-	
+	if (Attribute == GetMaxExperiencePointsAttribute())
+	{
+		SetExperiencePoints(0.f);
+	}
 }
 
 void URPGAttributeSet::AdjustAttributeForMaxChange(FGameplayAttributeData& AffectedAttribute, const FGameplayAttributeData& MaxAttribute, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty)
@@ -110,9 +113,7 @@ void URPGAttributeSet::AdjustAttributeForMaxChange(FGameplayAttributeData& Affec
 	const float CurrentMaxValue = MaxAttribute.GetCurrentValue();
 	if (!FMath::IsNearlyEqual(CurrentMaxValue, NewMaxValue) && AbilitySystemComponent)
 	{
-		const float CurrentValue = AffectedAttribute.GetCurrentValue();
-		float NewDelta = CurrentMaxValue > 0.f ? (CurrentValue*NewMaxValue/CurrentMaxValue)-CurrentValue : NewMaxValue;
-		AbilitySystemComponent->ApplyModToAttributeUnsafe(AffectedAttributeProperty, EGameplayModOp::Additive, NewDelta);
+		AbilitySystemComponent->ApplyModToAttributeUnsafe(AffectedAttributeProperty, EGameplayModOp::Override, NewMaxValue);
 	}
 }
 

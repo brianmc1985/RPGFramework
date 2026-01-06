@@ -51,26 +51,21 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "RPG Abilities")
 	bool ActivateAbilitiesWithTags(FGameplayTagContainer AbilityTags, bool AllowRemoteActivation = true);
 
-	/*Blueprint event when health is changed
-	  @param DeltaValue - will be negative for health decrease, positive otherwise
-	  @param Causer - who causes health change*/
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnHealthChanged(float DeltaValue, AActor* Causer);
-
 	/*Blueprint event when character dies*/
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnDead();
+	// RPGCharacter.h
 
-	//Blueprint event when stamina is changed
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent, Category = "RPG Attributes")
+	void OnHealthChanged(float DeltaValue, AActor* Causer);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "RPG Attributes")
 	void OnStaminaChanged(float DeltaValue, AActor* Causer);
 
-	//Blueprint event when adrenaline is changed
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent, Category = "RPG Attributes")
 	void OnAdrenalineChanged(float DeltaValue, AActor* Causer);
 
-	//Blueprint event when experience points are changed
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent, Category = "RPG Attributes")
 	void OnXPChanged(float DeltaValue);
 
 	//Character level getter
@@ -116,11 +111,8 @@ public:
 	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	virtual void HandleHealthChanged(float DeltaValue, AActor* Causer);
-
 	virtual void HandleStaminaChanged(float DeltaValue, AActor* Causer);
-
 	virtual void HandleAdrenalineChanged(float DeltaValue, AActor* Causer);
-
 	virtual void HandleExperiencePointsChanged(float DeltaValue);
 
 	virtual void HandleCharacterLeveledUp();

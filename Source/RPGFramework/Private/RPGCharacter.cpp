@@ -162,11 +162,10 @@ UAbilitySystemComponent* ARPGCharacter::GetAbilitySystemComponent() const
 
 void ARPGCharacter::HandleHealthChanged(float DeltaValue, AActor* Causer)
 {
+	// Llama al evento de Blueprint (el nuevo nombre)
 	OnHealthChanged(DeltaValue, Causer);
-	if (GetHealth() <= 0.f)
-	{
-		OnDead();
-	}
+
+	if (GetHealth() <= 0.f) { OnDead(); }
 }
 
 void ARPGCharacter::HandleStaminaChanged(float DeltaValue, AActor* Causer)
