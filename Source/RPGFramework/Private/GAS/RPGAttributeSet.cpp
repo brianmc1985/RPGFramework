@@ -5,6 +5,7 @@
 #include "Net/UnrealNetwork.h"
 #include "GameplayEffect.h"
 #include "GameplayEffectExtension.h"
+#include "RPGCharacter.h"
 
 URPGAttributeSet::URPGAttributeSet()
 {
@@ -27,25 +28,61 @@ void URPGAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 void URPGAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {
 	Super::PostGameplayEffectExecute(Data);
+
+	float DeltaValue = 0.f;
+
+	if (Data.EvaluatedData.ModifierOp == EGameplayModOp::Additive)
+	{
+		DeltaValue = Data.EvaluatedData.Magnitude;
+	}
+	
+	AActor* TargetActor = nullptr;
+	ARPGCharacter* RPGCharacter = nullptr;
+	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
+	{
+		TargetActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
+		RPGCharacter = Cast<ARPGCharacter>(TargetActor);
+	}
+
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
 		//Clamp Health between 0 and MaxHealth
 		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
+		if(RPGCharacter)
+		{
+			RPGCharacter->HandleHealthChanged(DeltaValue, Data.EffectSpec.GetContext().GetInstigator());
+		}
 	}
 	if(Data.EvaluatedData.Attribute == GetStaminaAttribute())
 	{
 		//Clamp Stamina between 0 and MaxStamina
 		SetStamina(FMath::Clamp(GetStamina(), 0.f, GetMaxStamina()));
+		if (RPGCharacter)
+		{
+			RPGCharacter->HandleStaminaChanged(DeltaValue, Data.EffectSpec.GetContext().GetInstigator());
+		}
 	}
 	if(Data.EvaluatedData.Attribute == GetAdrenalineAttribute())
 	{
 		//Clamp Adrenaline between 0 and MaxAdrenaline
 		SetAdrenaline(FMath::Clamp(GetAdrenaline(), 0.f, GetMaxAdrenaline()));
+		if (RPGCharacter)
+		{
+			RPGCharacter->HandleAdrenalineChanged(DeltaValue, Data.EffectSpec.GetContext().GetInstigator());
+		}
 	}
 	if(Data.EvaluatedData.Attribute == GetExperiencePointsAttribute())
 	{
-		//Clamp Experience Points between 0 and MaxExperiencePoints
-		SetExperiencePoints(FMath::Clamp(GetExperiencePoints(), 0.f, GetMaxExperiencePoints()));
+		float Difference = GetExperiencePoints() - GetMaxExperiencePoints();
+		if (RPGCharacter)
+		{
+			RPGCharacter->HandleExperiencePointsChanged(DeltaValue);
+			if (Difference >= 0.f)
+			{
+				RPGCharacter->HandleCharacterLeveledUp();
+			}
+
+		}
 	}
 }
 
@@ -64,10 +101,7 @@ void URPGAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, f
 	{
 		AdjustAttributeForMaxChange(Adrenaline, MaxAdrenaline, NewValue, GetAdrenalineAttribute());
 	}
-	if(Attribute == GetMaxExperiencePointsAttribute())
-	{
-		AdjustAttributeForMaxChange(ExperiencePoints, MaxExperiencePoints, NewValue, GetExperiencePointsAttribute());
-	}
+	
 }
 
 void URPGAttributeSet::AdjustAttributeForMaxChange(FGameplayAttributeData& AffectedAttribute, const FGameplayAttributeData& MaxAttribute, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty)
