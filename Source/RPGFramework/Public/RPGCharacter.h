@@ -72,6 +72,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnCharacterLeveledUp();
 
+	UFUNCTION(BlueprintCallable, Category = "RPG Abilities|Melee")
+	bool ActivateMeleeAbility(bool AllowRemoteActivation = true);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -90,13 +93,21 @@ protected:
 	TSubclassOf<class UGameplayEffect> DefaultAttributeEffects;
 
 	/*Set this to true if you want to add test abilities to character's ability component*/
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "RPG Attributes|Debug")
+	UPROPERTY(EditAnywhere, Category = "RPG Attributes|Debug")
 	bool EnableTestAbilities;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "RPG Attributes|Debug")
 	TArray<TSubclassOf<class UGameplayAbility>> TestAbilities;
 
 	virtual void SetTestAbilities();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "RPG Abilities|Melee")
+	TSubclassOf<class UGameplayAbility> MeleeAbility;
+
+	UPROPERTY()
+	FGameplayAbilitySpecHandle MeleeAbilitySpecHandle;
+
+	virtual void SetMeleeAbility();
 
 public:	
 	// Called every frame

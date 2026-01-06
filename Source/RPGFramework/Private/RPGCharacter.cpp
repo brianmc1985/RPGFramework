@@ -107,6 +107,15 @@ bool ARPGCharacter::ActivateAbilitiesWithTags(FGameplayTagContainer AbilityTags,
 	return AbilitySystemComponent->TryActivateAbilitiesByTag(AbilityTags, AllowRemoteActivation);
 }
 
+bool ARPGCharacter::ActivateMeleeAbility(bool AllowRemoteActivation)
+{
+	if (!AbilitySystemComponent || !MeleeAbilitySpecHandle.IsValid())
+	{
+		return false;
+	}
+	return AbilitySystemComponent->TryActivateAbility(MeleeAbilitySpecHandle, AllowRemoteActivation);
+}
+
 // Called when the game starts or when spawned
 void ARPGCharacter::BeginPlay()
 {
@@ -127,6 +136,15 @@ void ARPGCharacter::SetTestAbilities()
 			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(TestAbility, GetCharacterLevel(),INDEX_NONE,this ));
 		}
 	}
+}
+
+void ARPGCharacter::SetMeleeAbility()
+{
+	if (!AbilitySystemComponent)
+	{
+		return;
+	}
+	MeleeAbilitySpecHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(MeleeAbility, GetCharacterLevel(), INDEX_NONE, this));
 }
 
 // Called every frame
@@ -154,6 +172,7 @@ void ARPGCharacter::PossessedBy(AController* NewController)
 		SetTestAbilities();
 	}
 	ApplyDefaultAttributeEffects();
+	SetMeleeAbility();
 }
 UAbilitySystemComponent* ARPGCharacter::GetAbilitySystemComponent() const
 {
