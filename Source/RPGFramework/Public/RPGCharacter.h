@@ -90,7 +90,7 @@ protected:
 	int32 CharacterLevel;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "RPG Attributes")
-	TSubclassOf<class UGameplayEffect> DefaultAttributeEffects;
+	TArray<TSubclassOf<class UGameplayEffect>> DefaultAttributeEffects;
 
 	/*Set this to true if you want to add test abilities to character's ability component*/
 	UPROPERTY(EditAnywhere, Category = "RPG Attributes|Debug")

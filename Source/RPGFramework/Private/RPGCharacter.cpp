@@ -215,11 +215,15 @@ void ARPGCharacter::ApplyDefaultAttributeEffects()
 	//Apply Default Attribute Effect
 	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
 	EffectContext.AddSourceObject(this);
-	FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultAttributeEffects, CharacterLevel, EffectContext);
-	if (NewHandle.IsValid())
+	for (TSubclassOf<class UGameplayEffect>& DefaultEffect : DefaultAttributeEffects)
 	{
-		FActiveGameplayEffectHandle ActiveHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*NewHandle.Data.Get());
+		FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultEffect, CharacterLevel, EffectContext);
+		if (NewHandle.IsValid())
+		{
+			FActiveGameplayEffectHandle ActiveHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*NewHandle.Data.Get());
+		}
 	}
+	
 }
 
 void ARPGCharacter::RemoveDefaultAttributeEffects()
